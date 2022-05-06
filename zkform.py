@@ -28,14 +28,13 @@ log = logging.getLogger()
 #req_log = requests.logging.getLogger()
 #req_log.setLevel(logging.WARNING)  # Quiet down request API calls to airtable
 
-config_file = '/home/bitnami/notebooks/.env'
-with open(config_file) as cf:
-    config = json.load(cf)
+import dotenv
+load_dotenv()  # TYPEFORM_FORM_UID, TYPEFORM_API_KEY
 
 class ZKForm:
     def __init__(self):
-        self.config = self._load_config()
-        self.api_key = self.config["TYPEFORM_API_KEY"]
+        self._load_config()
+        self.api_key = TYPEFORM_API_KEY
         self.api = Typeform(self.api_key)
         self._cache_load()
 
@@ -46,12 +45,10 @@ class ZKForm:
         log.info('Done.')
         return True
 
-    def _load_config(self, env_path='.env'):
-        env_path = env_path or '.env'
-        config = {}
-        if os.path.exists(env_path):
-            with open(env_path) as env_conf:
-                config = json.load(env_conf)
+    def _load_config(self):
+        self.config = {
+            "TYPEFORM_FORM_UID": TYPEFORM_FORM_UID
+        }
         return config
 
     def get_lists(self):

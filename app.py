@@ -3,7 +3,8 @@
 # License: MIT
 # Author: Chris Ward <chris@zeroknowledge.fm>
 # Credits : https://github.com/MichaelSolati/typeform-python-examples/blob/master/webhooks/main.py
-# Airtable Interface for ZKDB (Zero Knowledge Podcast DB)
+
+# Simple Flask webserver to handle webhook calls from TypeForm
 
 __app_name__ = "webhooks"
 __version__ = "0.1"
@@ -17,8 +18,8 @@ import flask
 import hashlib
 from time import time
 
-# Variables, feel free to change them
-formURL = 'https://9lcje6jbgv1.typeform.com/to/eOCXPfIy'
+import dotenv
+dotenv.load_dotenv()  # TYPEFORM_FORM_UID
 
 # Message Board Handler
 def webhooksMessageBoard(request: flask.Request):
@@ -32,7 +33,7 @@ def webhooksMessageBoard(request: flask.Request):
 
 # Handle a POST request for our webhook demo
 # Handles the webhook
-def post(request: flask.Request):
+def post_typeform(request: flask.Request):
   data = request.get_json()
   payload = {
   }
@@ -59,20 +60,22 @@ def post(request: flask.Request):
   return payload
 
 def get():
-  return flask.render_template('index.html', formURL=formURL)
+  return flask.render_template('index.html', formURL=TYPEFORM_FORM_UID)  # formURL isn't used? FIXME
 
 app = flask.Flask(__name__)
 
 @app.route('/webhook', methods=['GET', 'POST'])
+#@app.route('/webhook-flask-v1', methods=['GET', 'POST'])  # Better naming! FIXME
 def webhook():
     if flask.request.method == "GET":
         # This is for "ping" purposes only" not useful otherwise
         return "Webhook received!"
 
     if flask.request.method == "POST":
-        return post(flask.request)
+        return post_typeform(flask.request)
 
 # Development
-app.run(host='127.0.0.1', port=9000)
+#app.run(host='127.0.0.1', port=9000)
+
 # Production - flask server isn't the same as nginx/apache...
-#app.run(host='0.0.0.0', port=9000)
+app.run(host='0.0.0.0', port=9000)
