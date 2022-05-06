@@ -32,26 +32,19 @@ config_file = '/home/bitnami/notebooks/.env'
 with open(config_file) as cf:
     config = json.load(cf)
 
-TYPEFORM_API_KEY = config.get('TYPEFORM_API_KEY', '')
-
-tf = Typeform(TYPEFORM_API_KEY)
-forms: dict = tf.forms.list()
-#tf.forms.get('eOCXPfIy')
-
 class ZKForm:
     def __init__(self):
         self.config = self._load_config()
-
         self.api_key = self.config["TYPEFORM_API_KEY"]
-
-        self.api = TypeForm(self.api_key)
-
+        self.api = Typeform(self.api_key)
         self._cache_load()
 
     def _cache_load(self):
         log.info('Loading Data Cache ...')
+        self.forms: dict = self.api.forms.list()
+        self.responses = self.api.responses
         log.info('Done.')
-        return tables
+        return True
 
     def _load_config(self, env_path='.env'):
         env_path = env_path or '.env'
@@ -61,6 +54,27 @@ class ZKForm:
                 config = json.load(env_conf)
         return config
 
+    def get_lists(self):
+        return self. forms
+
+    def get_responses(self, list_id):
+        _r = self.responses.list(list_id)
+        return _r
+
+#    def something():
+#        df_items = pd.DataFrame(result['items'])
+#        df_items['meta_list_id'] = list_id
+#        df_items['meta_page_count'] = result['page_count']
+#        df_items['meta_total_items'] = result['total_items']
+#        answers = df_items['answers']
+#        for a in answers:
+#            for field in a:
+#                ftype = field['type']
+#                fvar = field[ftype]
+#                print(ftype, fvar)
+#        for a in answers:
+#            for field in a:
+#                print (field['field'])
 
 if __name__ == "__main__":
-    zkform = ZKForm()
+    zform = ZKForm()
